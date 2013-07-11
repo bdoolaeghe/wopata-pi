@@ -1,14 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
-
-import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
 
 /**
  * Wopata java puzzle :-)
@@ -17,7 +9,7 @@ import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
  */
 class kskills {
 
-    private static PlotSet world; // the world !
+//    private static PlotSet world; // the world !
     private static PlotSet piSet; // points of interest in the world
     private static int k; // radius of circle where PI should be reachable
     private static int bestReachablePi = 0;
@@ -62,15 +54,15 @@ class kskills {
         Plot bestSite = null;
         if (piSet.size() <= 0) {
             bestReachablePi = 0;            
-        } else if (piSet.size() <= 1) {
+        } else if (piSet.size() >= 1) {
             bestReachablePi = 1;            
             bestSite = piSet.iterator().next();
-        } else {
+
             // at last 2 PI
             for (Plot candidate : searcheArea) {
                 int reachablePi = 0;
                 for (Plot pi : piSet) {
-                    double distance = distance(candidate, pi);
+                    double distance = new Segment(candidate, pi).getSize();
                     if (distance < k) {
                         // PI is reachable !
                         reachablePi++;
@@ -89,22 +81,14 @@ class kskills {
 
     /**
      * reduce the search area,
-     * by croping the minimal rectangle wrapping all PIs
-     * This croped rectangle may not be the minimal area wrapping all PIs, but as a rectangle, it is much very lowcoast to compute
+     * by croping to the minimal convexe hull wrapping all PIs
+     * This croped 
      * @param piSet
-     * @return 
+     * @return the reduced search area 
      */
     private static PlotSet reduceSearchArea(PlotSet piSet) {
-        throw new RuntimeException("not yet implemented !");
+        return piSet.getConvexHull().getGridContainedPlots();
     }
-    
-    
-//    private static PlotSet fillTriangle(Plot a, Plot b, Plot c) {
-//        PlotSet triangleArea = new PlotSet();
-//        
-//        return null;
-//        
-//    }
     
 
     /**
@@ -118,12 +102,14 @@ class kskills {
      * @return reduced PI set
      */
     private static PlotSet evictLonelyPi(PlotSet piSet, int radius) {
+        PlotSet lonelyPlots = new PlotSet();
+        
         if (piSet.size() > 1) {
             for (Plot plot1 : piSet) {
                 // is plot1 "lonely" in its area ?
                 boolean isAlone = true;
                 for (Plot plot2 : piSet) {
-                    if (plot1 != plot2 && distance(plot1, plot2) < (2 * radius)) {
+                    if (plot1 != plot2 && new Segment(plot1, plot2).getSize() < (2 * radius)) {
                         isAlone = false;
                         break;
                     }
@@ -131,26 +117,14 @@ class kskills {
                 
                 if (isAlone) {
                     // plot1 is alone, we can evict it to reduce the search area
-                    piSet.remove(plot1);
+                    lonelyPlots.add(plot1);
                 }
             }
         }
+        
+        piSet.removeAll(lonelyPlots);
+        
         return piSet;
-    }
-
-    /**
-     * compute distance between a and b plots
-     * 
-     * @param a
-     * @param b
-     * @return the distance
-     */
-    private static double distance(Plot a, Plot b) {
-        return Math.sqrt(
-                Math.pow((b.getX() - a.getX()), 2) 
-                + 
-                Math.pow((b.getY() - a.getY()), 2)
-               );
     }
 
     /**
@@ -163,10 +137,10 @@ class kskills {
 
         // parse the world size
         String[] split = r.readLine().split(";");
-        final int m = Integer.parseInt(split[0]);
-        final int n = Integer.parseInt(split[1]);
+//        final int m = Integer.parseInt(split[0]);
+//        final int n = Integer.parseInt(split[1]);
         // create the corresponding world "grid"
-        world = createWorld(m, n);
+//        world = createWorld(m, n);
 
         // parse circle and PI coordonates
         split = r.readLine().split(";");
@@ -183,22 +157,22 @@ class kskills {
         // dispose
         r.close();
     }
-
-    /**
-     * create the dimensionned world
-     * 
-     * @param m the world length
-     * @param n the world height
-     * @return a new world
-     */
-    private static PlotSet createWorld(final int m, final int n) {
-        PlotSet world = new PlotSet();
-        for (int x = 0; x < m; x++) {
-            for (int y = 0; y < n; y++) {
-                world.add(new Plot(x, y));
-            }
-        }
-        return world;
-    }
+//
+//    /**
+//     * create the dimensionned world
+//     * 
+//     * @param m the world length
+//     * @param n the world height
+//     * @return a new world
+//     */
+//    private static PlotSet createWorld(final int m, final int n) {
+//        PlotSet world = new PlotSet();
+//        for (int x = 0; x < m; x++) {
+//            for (int y = 0; y < n; y++) {
+//                world.add(new Plot(x, y));
+//            }
+//        }
+//        return world;
+//    }
 
 }

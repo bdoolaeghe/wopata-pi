@@ -97,6 +97,18 @@ public class Segment {
     public double getMaxY() {
         return Math.max(p1.getY(), p2.getY());
     }
+
+    /**
+     * @return the length (size) of the segment
+     */
+    public double getSize() {
+        return Math.sqrt(
+                Math.pow((p2.getX() - p1.getX()), 2) 
+                + 
+                Math.pow((p2.getY() - p1.getY()), 2)
+               );
+    }
+
     
     @Override
     public String toString() {

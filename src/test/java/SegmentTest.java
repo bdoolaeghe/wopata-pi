@@ -46,5 +46,12 @@ public class SegmentTest {
             assertTrue(p.getY() <= 3);
         }
     }
+    
+    @Test
+    public void getLength() throws Exception {
+        assertEquals(1, new Segment(new Plot(1, 1), new Plot(2,1)).getSize(), 0);
+        assertEquals(2, new Segment(new Plot(1, 1), new Plot(1,3)).getSize(), 0);
+        assertEquals(Math.sqrt(2), new Segment(new Plot(1, 1), new Plot(2,2)).getSize(), 0);
+    }
 
 }
