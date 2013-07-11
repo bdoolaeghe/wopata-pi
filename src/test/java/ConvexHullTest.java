@@ -167,14 +167,22 @@ public class ConvexHullTest {
         PlotSet.ConvexHull convexHull = plots.getConvexHull();
         PlotSet containedAreaGrid = convexHull.getGridContainedPlots();
 
+        // build the expected area
         PlotSet expectedArea = new PlotSet();
-        expectedArea.add(p0);
-        expectedArea.add(p1);
-        expectedArea.add(p2);
-        expectedArea.add(p3);
-        expectedArea.add(new Plot(1,2));
-        expectedArea.add(new Plot(2,3));
-        assertEquals(expectedArea, containedAreaGrid);
+        expectedArea.add(new Plot(0,0));
+        for (int i = 1; i < 8; i++) {
+            for (int j = 0; j < 3; j++) {
+                expectedArea.add(new Plot(i,j));        
+            }
+        }
+        for (int i = 2; i < 8; i++) {
+            for (int j = 3; j < 5; j++) {
+                expectedArea.add(new Plot(i,j));        
+            }
+        }
+        expectedArea.add(new Plot(7,5));
+        
+        assertEquals(expectedArea.toString(), containedAreaGrid.toString());
     }
     
 

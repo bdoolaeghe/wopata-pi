@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -159,5 +160,17 @@ public class PlotSet extends HashSet<Plot> {
         }
     }
 
+    @Override
+    public String toString() {
+        String s = super.toString();
+        String[] splits = s.split("\\),");
+        Arrays.sort(splits);
+        s = ""; 
+        for (String split : splits) {
+            s = s + split + ")\n";
+        }        
+        
+        return s;
+    }
     
 };
