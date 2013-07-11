@@ -5,7 +5,7 @@ import java.util.Comparator;
  * 
  * @author bdoolaeghe
  */
-public class Plot {
+class Plot {
 
     private double x;
     private double y;

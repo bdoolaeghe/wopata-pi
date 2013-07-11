@@ -4,7 +4,7 @@ import java.util.Arrays;
  * a triangle 
  * @author Bruno DOOLAEGHE
  */
-public class Triangle {
+class Triangle {
 
     private Plot pLeft;
     private Plot pMiddle;

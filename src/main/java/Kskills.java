@@ -1,8 +1,12 @@
 
 /**
  * Wopata java puzzle :-)
+ * <br><br>
+ * challenge : <a href="http://www.kskills.com/Home/PublicChallengeDetail/493">http://www.kskills.com/Home/PublicChallengeDetail/493</a>
+ * <br>
+ * solution sources : <a href="https://github.com/bdoolaeghe/wopata-pi.git">https://github.com/bdoolaeghe/wopata-pi.git</a>
  * 
- * @author bdoolaeghe
+ * @author Bruno DOOLAEGHE
  */
 class kskills {
 

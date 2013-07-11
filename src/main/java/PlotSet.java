@@ -11,7 +11,7 @@ import java.util.Stack;
  * @author bdoolaeghe
  * 
  */
-public class PlotSet extends HashSet<Plot> {
+class PlotSet extends HashSet<Plot> {
     
     private static final long serialVersionUID = 1L;
     

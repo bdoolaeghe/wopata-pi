@@ -4,7 +4,7 @@
  * 
  * @author bdoolaeghe
  */
-public class VerticalBrush {
+class VerticalBrush {
 
     private double x;
     private double yTop;

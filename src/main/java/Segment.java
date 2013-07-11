@@ -3,7 +3,7 @@
  * a segment (a set of plots between 2 plots "a" and "b" )
  * @author Bruno DOOLAEGHE
  */
-public class Segment {
+class Segment {
     
     private Plot p1;
     private Plot p2;
