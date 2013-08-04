@@ -22,6 +22,12 @@ class PlotSet extends HashSet<Plot> {
         }
     }
 
+    public PlotSet copy() {
+        PlotSet copy = new PlotSet();
+        copy.addAll(this);
+        return copy;
+    }
+    
     /**
      * create a new Plot and add it to the {@link PlotSet}
      * @param x of the plot to add
@@ -88,15 +94,15 @@ class PlotSet extends HashSet<Plot> {
 
     @Override
     public String toString() {
-        String s = super.toString();
+        String s = super.toString().replaceAll("\\[", "").replaceAll("\\]", "");
         String[] splits = s.split("\\),");
         Arrays.sort(splits);
-        s = ""; 
+        s = "<\n"; 
         for (String split : splits) {
             s = s + split + ")\n";
         }        
         
-        return s;
+        return s + ">";
     }
     
 };

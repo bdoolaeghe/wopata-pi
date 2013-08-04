@@ -3,6 +3,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 
+/**
+ * @author Bruno DOOLAEGHE
+ */
 public class PowerPlotSetTest {
 
     @Test
