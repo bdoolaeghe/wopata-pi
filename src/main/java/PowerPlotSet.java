@@ -102,5 +102,4 @@ class PowerPlotSet {
         return plotset.isFullyReachableFrom(center, radius);
     }
 
-
 }
