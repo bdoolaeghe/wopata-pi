@@ -8,7 +8,7 @@ import org.junit.Test;
  */
 public class PowerPlotSetTest {
 
-    @Test
+    @Test(timeout=1000)
     public void maxReachablePlots3() {
         Plot p0 = new Plot(3, 1);
         Plot p1 = new Plot(1, 1);
@@ -19,7 +19,7 @@ public class PowerPlotSetTest {
         assertEquals(3, maxReachablePlots);
     }
 
-    @Test
+    @Test(timeout=1000)
     public void maxReachablePlots2() {
         Plot p0 = new Plot(1, 1);
         Plot p1 = new Plot(1, 2);
@@ -30,7 +30,7 @@ public class PowerPlotSetTest {
         assertEquals(2, maxReachablePlots);
     }
     
-    @Test
+    @Test(timeout=1000)
     public void maxReachablePlots1() {
         Plot p0 = new Plot(1, 1);
         Plot p1 = new Plot(1, 4);
@@ -41,7 +41,7 @@ public class PowerPlotSetTest {
         assertEquals(1, maxReachablePlots);
     }
     
-    @Test
+    @Test(timeout=1000)
     public void maxReachablePlots1Exemple() {
         Plot p0 = new Plot(4, 4);
         Plot p1 = new Plot(6, 3);
@@ -55,7 +55,7 @@ public class PowerPlotSetTest {
     }
     
 
-    @Test
+    @Test(timeout=1000)
     public void maxReachablePlots1MiniPlan() {
         Plot p0 = new Plot(0, 0);
         Plot p1 = new Plot(0, 1);
@@ -67,7 +67,7 @@ public class PowerPlotSetTest {
     }
 
     
-    @Test
+    @Test(timeout=1000)
     public void maxReachablePlots1GrandPlan() {
         Plot [] plots = new Plot[] {
                 new Plot(2,2),
@@ -97,8 +97,38 @@ public class PowerPlotSetTest {
         assertEquals(5, maxReachablePlots);
     }
     
+    @Test(timeout=1000)
+    public void maxReachablePlots1GrandPlanGrandCercel() {
+        Plot [] plots = new Plot[] {
+                new Plot(2,2),
+                new Plot(3,8),
+                new Plot(4,14),
+                new Plot(6,11),
+                new Plot(7,8),
+                new Plot(8,5),
+                new Plot(9,12),
+                new Plot(12,3),
+                new Plot(13,10),
+                new Plot(16,6),
+                new Plot(16,12),
+                new Plot(17,2),
+                new Plot(18,9),
+                new Plot(19,13),
+                new Plot(22,3),
+                new Plot(25,4),
+                new Plot(26,10),
+                new Plot(29,3),
+                new Plot(30,6),
+                new Plot(30,14)
+        };
+        PlotSet plotset = new PlotSet(plots);
+        
+        int maxReachablePlots = new PowerPlotSet(plotset).maxReachablePlots(20);
+        assertEquals(20, maxReachablePlots);
+    }
     
-    @Test
+    
+    @Test(timeout=1000)
     public void maxReachablePlots11SeulPointPossible() {
         Plot [] plots = new Plot[] {
                 new Plot(0,0),
