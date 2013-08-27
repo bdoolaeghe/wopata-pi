@@ -8,11 +8,14 @@ class Plot {
 
     private double x;
     private double y;
+    private int hashCode;
 
     public Plot(double x, double y) {
         super();
         this.x = x;
         this.y = y;
+        // immuable object
+        this.hashCode = computeHashcode();
     }
 
     /**
@@ -36,6 +39,10 @@ class Plot {
 
     @Override
     public int hashCode() {
+        return hashCode;
+    }
+
+    private int computeHashcode() {
         final int prime = 31;
         int result = 1;
         long temp;

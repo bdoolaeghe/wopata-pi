@@ -53,11 +53,11 @@ public class PowerPlotSetCompositeConcurrentServiceImpl implements IPowerPlotSet
         Integer result = null;
         try {
             result = futureResult1.get();
-            System.out.println(powerPlotSetService1.getClass().getSimpleName() + " has found the solution : " + result); 
+//            System.out.println(powerPlotSetService1.getClass().getSimpleName() + " has found the solution : " + result); 
         } catch (InterruptedException | ExecutionException e) {
             try {
                 result = futureResult2.get();
-                System.out.println(powerPlotSetService2.getClass().getSimpleName() + " has found the solution : " + result); 
+//                System.out.println(powerPlotSetService2.getClass().getSimpleName() + " has found the solution : " + result); 
             } catch (InterruptedException | ExecutionException e1) {
                 //should never happen
                 throw new RuntimeException("None of the 2 workers ended successfully", e1);
