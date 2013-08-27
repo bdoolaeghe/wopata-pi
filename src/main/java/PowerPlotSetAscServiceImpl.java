@@ -39,8 +39,6 @@ public class PowerPlotSetAscServiceImpl extends Killable implements IPowerPlotSe
             PlotSet pSet = new PlotSet();
             pSet.add(plot);
             rootPlotSetSet.add(pSet);
-
-            checkIsNotKilled();
         }
         // laucn recursive call
         return maxReachablePlots(rootPlotSetSet, radius);
