@@ -6,7 +6,7 @@ import org.junit.Test;
 /**
  * @author Bruno DOOLAEGHE
  */
-public class PowerPlotSetTest {
+public class PowerPlotSetServiceTest {
 
     @Test(timeout=1000)
     public void maxReachablePlots3() {
@@ -15,7 +15,7 @@ public class PowerPlotSetTest {
         Plot p2 = new Plot(2, 2);
         PlotSet plots = new PlotSet(p0, p1, p2);
 
-        int maxReachablePlots = new PowerPlotSet(plots).maxReachablePlots(2);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(plots).maxReachablePlots(2);
         assertEquals(3, maxReachablePlots);
     }
 
@@ -26,7 +26,7 @@ public class PowerPlotSetTest {
         Plot p2 = new Plot(3, 1);
         PlotSet plots = new PlotSet(p0, p1, p2);
         
-        int maxReachablePlots = new PowerPlotSet(plots).maxReachablePlots(1);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(plots).maxReachablePlots(1);
         assertEquals(2, maxReachablePlots);
     }
     
@@ -37,7 +37,7 @@ public class PowerPlotSetTest {
         Plot p2 = new Plot(4, 1);
         PlotSet plots = new PlotSet(p0, p1, p2);
         
-        int maxReachablePlots = new PowerPlotSet(plots).maxReachablePlots(1);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(plots).maxReachablePlots(1);
         assertEquals(1, maxReachablePlots);
     }
     
@@ -50,7 +50,7 @@ public class PowerPlotSetTest {
         Plot p4 = new Plot(12, 10);
         PlotSet plots = new PlotSet(p0, p1, p2, p3, p4);
         
-        int maxReachablePlots = new PowerPlotSet(plots).maxReachablePlots(3);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(plots).maxReachablePlots(3);
         assertEquals(4, maxReachablePlots);
     }
     
@@ -62,7 +62,7 @@ public class PowerPlotSetTest {
         Plot p2 = new Plot(1, 0);
         PlotSet plots = new PlotSet(p0, p1, p2);
         
-        int maxReachablePlots = new PowerPlotSet(plots).maxReachablePlots(4);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(plots).maxReachablePlots(4);
         assertEquals(3, maxReachablePlots);
     }
 
@@ -93,7 +93,7 @@ public class PowerPlotSetTest {
         };
         PlotSet plotset = new PlotSet(plots);
         
-        int maxReachablePlots = new PowerPlotSet(plotset).maxReachablePlots(5);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(plotset).maxReachablePlots(5);
         assertEquals(5, maxReachablePlots);
     }
     
@@ -123,7 +123,7 @@ public class PowerPlotSetTest {
         };
         PlotSet plotset = new PlotSet(plots);
         
-        int maxReachablePlots = new PowerPlotSet(plotset).maxReachablePlots(20);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(plotset).maxReachablePlots(20);
         assertEquals(20, maxReachablePlots);
     }
     
@@ -138,7 +138,7 @@ public class PowerPlotSetTest {
                 };
         PlotSet plotset = new PlotSet(plots);
         
-        int maxReachablePlots = new PowerPlotSet(plotset).maxReachablePlots(2);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(plotset).maxReachablePlots(2);
         assertEquals(1, maxReachablePlots);
     }
     
