@@ -7,7 +7,6 @@ import java.util.concurrent.Future;
 /**
  * a composite concurrent impl, browsing concurrently from the top and from the bottom the powerset
  * @author Bruno DOOLAEGHE
- *
  */
 public class PowerPlotSetCompositeConcurrentServiceImpl implements IPowerPlotSetService {
     

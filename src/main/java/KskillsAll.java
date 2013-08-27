@@ -2,10 +2,14 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Wopata java puzzle :-)
@@ -13,7 +17,7 @@ import java.util.Arrays;
  * challenge : <a href="http://www.kskills.com/Home/PublicChallengeDetail/493">http://www.kskills.com/Home/PublicChallengeDetail/493</a>
  * <br>
  * solution sources and tests : <a href="https://github.com/bdoolaeghe/wopata-pi.git">https://github.com/bdoolaeghe/wopata-pi.git</a>
- * @version 3.0 
+ * @version 4.0 
  * @author Bruno DOOLAEGHE
  */
 class kskillsAll {
@@ -22,11 +26,14 @@ class kskillsAll {
 
         private double x;
         private double y;
+        private int hashCode;
 
         public Plot(double x, double y) {
             super();
             this.x = x;
             this.y = y;
+            // immuable object
+            this.hashCode = computeHashcode();
         }
 
         /**
@@ -42,7 +49,7 @@ class kskillsAll {
         public double getY() {
             return y;
         }
-
+        
         @Override
         public String toString() {
             return "P(" + x +" , " + y + ")";
@@ -50,6 +57,10 @@ class kskillsAll {
 
         @Override
         public int hashCode() {
+            return hashCode;
+        }
+
+        private int computeHashcode() {
             final int prime = 31;
             int result = 1;
             long temp;
@@ -89,7 +100,7 @@ class kskillsAll {
         public PlotSet() {
             super();
         }
-
+        
         public PlotSet(Plot...plots) {
             super();
             for (Plot plot : plots) {
@@ -97,15 +108,33 @@ class kskillsAll {
             }
         }
 
-        /**
-         * @return a copy of {@link PlotSet} (containing same {@link Plot}s)
-         */
         public PlotSet copy() {
             PlotSet copy = new PlotSet();
             copy.addAll(this);
             return copy;
         }
+        
+        /**
+         * create a new Plot and add it to the {@link PlotSet}
+         * @param x of the plot to add
+         * @param y of the plot to add
+         */
+        public void addPlot(double x, double y) {
+            this.add(new Plot(x, y));
+        }
 
+        /**
+         * create a new sub plot set, without the black plot
+         * @param blackPlot
+         * @return a new subset equals to this subset minus blackplot
+         */
+        public PlotSet subSetWithout(Plot blackPlot) {
+            PlotSet subSet = new PlotSet();
+            subSet.addAll(this);
+            subSet.remove(blackPlot);
+            return subSet;
+        }
+        
         /**
          * compute the baricenter of plots
          * @return the baricenter
@@ -119,7 +148,7 @@ class kskillsAll {
             }
             return new Plot(sumX / (double) size(), sumY / (double) size());
         }
-
+        
         /**
          * @param center
          * @param range
@@ -134,7 +163,7 @@ class kskillsAll {
             // else, all plots have been reached
             return true;
         }
-
+        
         /**
          * get the gap between 2 plots
          * @param p1
@@ -158,18 +187,64 @@ class kskillsAll {
             for (String split : splits) {
                 s = s + split + ")\n";
             }        
-
+            
             return s + ">";
         }
+    }
 
-    };
 
+    static class KilledException extends Exception {
+        private static final long serialVersionUID = 1L;
+    }
+    
+    static  class Killable {
 
-    static class PowerPlotSet {
+        private boolean isKilled = false;
+
+        
+        /**
+         * stop the exeuction
+         */
+        public void kill() {
+            this.isKilled = true;
+        }
+        
+        public void checkIsNotKilled() throws KilledException {
+            if (isKilled)
+                throw new KilledException();
+        }
+    }
+
+    
+    /**
+     * a power set tool kit
+     * @author Bruno DOOLAEGHE
+     * @see <a href="http://en.wikipedia.org/wiki/Power_set">power set</a>
+     */
+    static interface IPowerPlotSetService {
+
+        /**
+         * give the max number or plots (points of interest) you can rope in a cicle
+         * 
+         * @param radius of the circle
+         * @return the max number of plots we can rope in a circle
+         * @throws KilledException 
+         */
+        public abstract int maxReachablePlots(int radius) throws KilledException;
+
+    }
+    
+    /**
+     * an impl using powerset of plots ascending algorithm 
+     * @author Bruno DOOLAEGHE
+     * @see <a href="http://en.wikipedia.org/wiki/Power_set">power set</a>
+     */
+    static class PowerPlotSetAscServiceImpl extends Killable implements IPowerPlotSetService {
 
         private PlotSet allPlots;
 
-        public PowerPlotSet(PlotSet allPlots) {
+        
+        public PowerPlotSetAscServiceImpl(PlotSet allPlots) {
             super();
             this.allPlots = allPlots;
         }
@@ -188,14 +263,18 @@ class kskillsAll {
          * untill we got plot sets to big to rope all plots in a circle or untill we manage to rope all plots of maps
          * @param radius of the circle
          * @return the max number of plots we can rope in a circle
+         * @throws KilledException 
          */
-        public int maxReachablePlots(int radius) {
+        @Override
+        public int maxReachablePlots(int radius) throws KilledException {
             // init recursive call with a plotSet set of one plot
             Set<PlotSet> rootPlotSetSet = new HashSet<PlotSet>();
             for (Plot plot : allPlots) {
                 PlotSet pSet = new PlotSet();
                 pSet.add(plot);
                 rootPlotSetSet.add(pSet);
+
+                checkIsNotKilled();
             }
             // laucn recursive call
             return maxReachablePlots(rootPlotSetSet, radius);
@@ -206,8 +285,9 @@ class kskillsAll {
          * @param plotSetSet a set of plotSet
          * @param radius of the circle
          * @return the computed max number
+         * @throws KilledException 
          */
-        private int maxReachablePlots(Set<PlotSet> plotSetSet, int radius) {
+        private int maxReachablePlots(Set<PlotSet> plotSetSet, int radius) throws KilledException {
             int currentPlotSetsSize = plotSetSet.iterator().next().size();
 
             // else, let's prune all plotset we can not fully reach from baricenter
@@ -217,6 +297,8 @@ class kskillsAll {
                     // this plotset still in curse !
                     remainingPlotSetSet.add(candidatePlotSet);
                 }
+                
+                checkIsNotKilled();
             }
 
             if (remainingPlotSetSet.size() == 0) {
@@ -238,6 +320,8 @@ class kskillsAll {
                         if (biggerPlotSet.size() == currentPlotSetsSize + 1) {
                             biggerPlotSetSet.add(biggerPlotSet);
                         }
+                        
+                        checkIsNotKilled();
                     }
                 }
 
@@ -261,6 +345,186 @@ class kskillsAll {
 
     }
 
+    /**
+     * an impl using powerset of plots descending algorithm 
+     * @author Bruno DOOLAEGHE
+     * @see <a href="http://en.wikipedia.org/wiki/Power_set">power set</a>
+     */
+
+    static class PowerPlotSetDescServiceImpl extends Killable implements IPowerPlotSetService {
+
+        private PlotSet allPlots;
+
+        public PowerPlotSetDescServiceImpl(PlotSet allPlots) {
+            super();
+            this.allPlots = allPlots;
+        }
+
+        /**
+         * give the max number or plots (points of interest) you can rope in a cicle
+         * <br>
+         * This algorithm tries to reach from baricenter all plots of the following plot sets :
+         * <ul>
+         * <li> plot set all (n) plots</li>
+         * <li> then plot sets of n-1 plots</li>
+         * <li> then plot sets of n-2 plots</li>
+         * <li> etc...</li>  
+         *</ul>
+         * ... untill all plots of current size plot set can be roped in baricentered circle (or plot sets have only one plot)
+         * @param radius of the circle
+         * @return the max number of plots we can rope in a circle
+         * @throws KilledException 
+         */
+        @Override
+        public int maxReachablePlots(int radius) throws KilledException {
+            // start recursive browse
+            Set<PlotSet> rootPlotSetSet = new HashSet<PlotSet>();
+            rootPlotSetSet.add(allPlots);
+            return maxReachablePlots(rootPlotSetSet, radius);
+        }
+
+
+        /**
+         * recursive scan :
+         * first, the top floor of the set of powerset
+         * then, invoke recurivly on the next under-floor
+         * @param currentPlotSetSet
+         * @param radius
+         * @return
+         * @throws KilledException 
+         */
+        private int maxReachablePlots(Set<PlotSet> currentPlotSetSet, int radius) throws KilledException {
+            // scan first floor
+            int maxReachablePlots = maxReachablePlotsOnFloor(currentPlotSetSet, radius);
+
+            if (maxReachablePlots != 0) {
+                return maxReachablePlots;
+            } else {
+                // scan next floor
+                Set<PlotSet> inferiorPlotSetSet = getNextFloor(currentPlotSetSet);
+                return maxReachablePlots(inferiorPlotSetSet, radius);
+            }
+        }
+
+        /**
+         * scan among all set of plotset having same size if there is a plotset fully reachable
+         * @param plotSetSet
+         * @param radius
+         * @return 0 if none is found, or number of reached plots if found
+         * @throws KilledException 
+         */
+        private int maxReachablePlotsOnFloor(Set<PlotSet> plotSetSet, int radius) throws KilledException {
+            for (PlotSet plotSet : plotSetSet) {
+                if (isFullyReachable(plotSet, radius)) {
+                    // the plotset is a maximum !
+                    return plotSet.size();
+                }
+                checkIsNotKilled();
+            }
+            return 0;
+        }
+
+        /**
+         * given a set of <n> sized plotset, returns the set of <n-1> sized plotset
+         * @param superiorPlotSetSet
+         * @return
+         * @throws KilledException 
+         */
+        private Set<PlotSet> getNextFloor(Set<PlotSet> superiorPlotSetSet) throws KilledException {
+            Set<PlotSet> inferiorPlotSetSet = new HashSet<PlotSet>();
+
+            for (PlotSet plotSet : superiorPlotSetSet) {
+                for (Plot blackPlot : plotSet) {
+                    PlotSet subSet = plotSet.subSetWithout(blackPlot);
+                    inferiorPlotSetSet.add(subSet);
+                    checkIsNotKilled();
+                }
+            }
+
+            return inferiorPlotSetSet;
+        }
+
+        /**
+         * visit the plotset and say if all plots are in a same circle
+         * @param plotset
+         * @param radius
+         * @return true is all a plots are reachable, or false if not or fi plots have been already previously visited
+         */
+        private boolean isFullyReachable(PlotSet plotset, int radius) {
+            // try to reach all plots
+            Plot center = plotset.baricenter();
+            // System.out.println(center);
+            return plotset.isFullyReachableFrom(center, radius);
+        }
+    
+    }
+
+    
+    /**
+     * a composite concurrent impl, browsing concurrently from the top and from the bottom the powerset
+     * @author Bruno DOOLAEGHE
+     */
+    static class PowerPlotSetCompositeConcurrentServiceImpl implements IPowerPlotSetService {
+        
+        private PlotSet allPlots;
+
+        public PowerPlotSetCompositeConcurrentServiceImpl(PlotSet allPlots) {
+            super();
+            this.allPlots = allPlots;
+        }
+        
+        @Override
+        public int maxReachablePlots(final int radius) {
+            // create delegates services
+            final PowerPlotSetAscServiceImpl powerPlotSetService1 = new PowerPlotSetAscServiceImpl(allPlots);
+            final PowerPlotSetDescServiceImpl powerPlotSetService2 = new PowerPlotSetDescServiceImpl(allPlots);
+            
+            // create parallel workers
+            Callable<Integer> worker1 = new Callable<Integer>() {
+                
+                @Override
+                public Integer call() throws Exception {
+                    int maxReachablePlots = powerPlotSetService1.maxReachablePlots(radius);
+                    powerPlotSetService2.kill();
+                    return maxReachablePlots;
+                }
+            };  
+            Callable<Integer> worker2 = new Callable<Integer>() {
+                
+                @Override
+                public Integer call() throws Exception {
+                    int maxReachablePlots = powerPlotSetService2.maxReachablePlots(radius);
+                    powerPlotSetService1.kill();
+                    return maxReachablePlots;
+                }
+            };  
+                
+            // run in parallel 2 workers
+            ExecutorService workerPool = Executors.newFixedThreadPool(2);
+            Future<Integer> futureResult1 = workerPool.submit(worker1);
+            Future<Integer> futureResult2 = workerPool.submit(worker2);
+            
+            // get result from winner worker
+            Integer result = null;
+            try {
+                result = futureResult1.get();
+//                System.out.println(powerPlotSetService1.getClass().getSimpleName() + " has found the solution : " + result); 
+            } catch (InterruptedException | ExecutionException e) {
+                try {
+                    result = futureResult2.get();
+//                    System.out.println(powerPlotSetService2.getClass().getSimpleName() + " has found the solution : " + result); 
+                } catch (InterruptedException | ExecutionException e1) {
+                    //should never happen
+                    throw new RuntimeException("None of the 2 workers ended successfully", e1);
+                }
+            }
+            
+            return result.intValue();
+        }
+
+    }
+
+    
     static class InputBean {
 
         private int k;
@@ -294,7 +558,7 @@ class kskillsAll {
         // compute the best place for holiday
         int k = inputBean.getK();
         PlotSet piSet = inputBean.getPiSet();
-        int maxReachablePlots = new PowerPlotSet(piSet).maxReachablePlots(k);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(piSet).maxReachablePlots(k);
 
         // ouput the best number of reachable PI
         System.out.println(maxReachablePlots);
