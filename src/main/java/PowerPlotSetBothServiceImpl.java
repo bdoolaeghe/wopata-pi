@@ -27,20 +27,37 @@ public class PowerPlotSetBothServiceImpl  implements IPowerPlotSetService {
      */
     public int maxReachablePlots(int radius)  {
         // a. init bottomup recursive call with a plotSet set of one plot
+        Set<PlotSet> bootomUpRootPlotSetSet = createSinglePlotPlotSets();
+        
+        // b. init topdown recursive call with a full plotset
+        Set<PlotSet> topDownRootPlotSetSet = createAllPlotsPlotSet();
+        
+        // start recursive call
+        return maxReachablePlots(bootomUpRootPlotSetSet, topDownRootPlotSetSet, radius);
+    }
+
+    /**
+     * create the set of (one) plotset containing all plots
+     * @return
+     */
+    private Set<PlotSet> createAllPlotsPlotSet() {
+        Set<PlotSet> topDownRootPlotSetSet = new HashSet<PlotSet>();
+        topDownRootPlotSetSet.add(allPlots);
+        return topDownRootPlotSetSet;
+    }
+
+    /**
+     * create the set of all plotsets of one plot
+     * @return
+     */
+    private Set<PlotSet> createSinglePlotPlotSets() {
         Set<PlotSet> bootomUpRootPlotSetSet = new HashSet<PlotSet>();
         for (Plot plot : allPlots) {
             PlotSet pSet = new PlotSet();
             pSet.add(plot);
             bootomUpRootPlotSetSet.add(pSet);
         }
-        
-        // b. init topdown recursive call with a full plotset
-        Set<PlotSet> topDownRootPlotSetSet = new HashSet<PlotSet>();
-        topDownRootPlotSetSet.add(allPlots);
-
-        
-        // laucn recursive call
-        return maxReachablePlots(bootomUpRootPlotSetSet, topDownRootPlotSetSet, radius);
+        return bootomUpRootPlotSetSet;
     }
 
     /**
@@ -91,16 +108,16 @@ public class PowerPlotSetBothServiceImpl  implements IPowerPlotSetService {
             
             // b. top down currnt floor plotset set browsing
             /////////////////////////////////////////////////
-            // scan floor
+            // b1. scan current floor
             int maxReachablePlots = maxReachablePlotsOnFloor(topDownPlotSetSet, radius);
             if (maxReachablePlots != 0) {
                 return maxReachablePlots;
             } 
             
-            // else, compute next inferior floor
+            // b2. else, compute next inferior floor
             Set<PlotSet> inferiorTopDownPlotSetSet = getNextFloor(topDownPlotSetSet);
             
-            // let's test the 2 next up and down floors of powerset
+            // let's try the 2 next up and down floors of powerset
             return maxReachablePlots(superiorBottomUpPlotSetSet, inferiorTopDownPlotSetSet, radius);
         }
     }
