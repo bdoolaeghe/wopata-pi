@@ -47,7 +47,7 @@ class kskillsAlone {
         // compute the best place for holiday
         int k = inputBean.getK();
         PlotSet piSet = inputBean.getPiSet();
-        int maxReachablePlots = new PowerPlotSet(piSet).maxReachablePlots(k);
+        int maxReachablePlots = new PowerPlotSetCompositeConcurrentServiceImpl(piSet).maxReachablePlots(k);
 
         // ouput the best number of reachable PI
         System.out.println(maxReachablePlots);

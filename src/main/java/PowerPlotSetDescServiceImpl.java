@@ -31,7 +31,6 @@ public class PowerPlotSetDescServiceImpl extends Killable implements IPowerPlotS
      * @return the max number of plots we can rope in a circle
      * @throws KilledException 
      */
-    @Override
     public int maxReachablePlots(int radius) throws KilledException {
         // start recursive browse
         Set<PlotSet> rootPlotSetSet = new HashSet<PlotSet>();

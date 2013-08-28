@@ -1,5 +1,4 @@
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -17,7 +16,6 @@ public class PowerPlotSetCompositeConcurrentServiceImpl implements IPowerPlotSet
         this.allPlots = allPlots;
     }
     
-    @Override
     public int maxReachablePlots(final int radius) {
         // create delegates services
         final PowerPlotSetAscServiceImpl powerPlotSetService1 = new PowerPlotSetAscServiceImpl(allPlots);
@@ -26,7 +24,6 @@ public class PowerPlotSetCompositeConcurrentServiceImpl implements IPowerPlotSet
         // create parallel workers
         Callable<Integer> worker1 = new Callable<Integer>() {
             
-            @Override
             public Integer call() throws Exception {
                 int maxReachablePlots = powerPlotSetService1.maxReachablePlots(radius);
                 powerPlotSetService2.kill();
@@ -35,7 +32,6 @@ public class PowerPlotSetCompositeConcurrentServiceImpl implements IPowerPlotSet
         };  
         Callable<Integer> worker2 = new Callable<Integer>() {
             
-            @Override
             public Integer call() throws Exception {
                 int maxReachablePlots = powerPlotSetService2.maxReachablePlots(radius);
                 powerPlotSetService1.kill();
@@ -53,11 +49,11 @@ public class PowerPlotSetCompositeConcurrentServiceImpl implements IPowerPlotSet
         try {
             result = futureResult1.get();
 //            System.out.println(powerPlotSetService1.getClass().getSimpleName() + " has found the solution : " + result); 
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (Exception e) {
             try {
                 result = futureResult2.get();
 //                System.out.println(powerPlotSetService2.getClass().getSimpleName() + " has found the solution : " + result); 
-            } catch (InterruptedException | ExecutionException e1) {
+            } catch (Exception e1) {
                 //should never happen
                 throw new RuntimeException("None of the 2 workers ended successfully", e1);
             }
